@@ -56,6 +56,7 @@
 
 ## Contents
 - [Install](#install)
+- [Batch Processing Wrapper](#batch-processing-wrapper) (NEW!)
 - [vLLM Inference](#vllm-inference)
 - [Transformers Inference](#transformers-inference)
   
@@ -84,6 +85,80 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.3 --no-build-isolation
 ```
 **Note:** if you want vLLM and transformers codes to run in the same environment, you don't need to worry about this installation error like: vllm 0.8.5+cu118 requires transformers>=4.51.1
+
+## Batch Processing Wrapper
+
+We provide a user-friendly wrapper for batch processing multiple images with DeepSeek OCR. This tool makes it easy to process entire directories of images with a simple command or Python API.
+
+### Quick Start
+
+#### Command Line Interface
+
+Process all images in a directory:
+```bash
+# Using vLLM backend (recommended for batch processing)
+python batch_ocr.py --input-dir ./images --output-dir ./results
+
+# Using Transformers backend (simpler setup)
+python batch_ocr.py --input-dir ./images --output-dir ./results --backend transformers
+
+# Custom processing mode
+python batch_ocr.py --input-dir ./images --output-dir ./results --mode gundam
+
+# Custom prompt
+python batch_ocr.py --input-dir ./images --output-dir ./results --prompt "<image>\nFree OCR."
+```
+
+#### Python API
+
+```python
+from batch_ocr import DeepSeekOCRWrapper
+
+# Create wrapper
+wrapper = DeepSeekOCRWrapper(backend="vllm", mode="gundam")
+
+# Process directory
+results = wrapper.process_directory(
+    input_dir="./images",
+    output_dir="./results",
+    prompt="<image>\n<|grounding|>Convert the document to markdown."
+)
+
+print(f"Processed {len(results)} images")
+```
+
+### Features
+
+- **Dual Backend Support**: Choose between vLLM (fast) or Transformers (simple)
+- **Batch Processing**: Process multiple images in parallel with progress tracking
+- **Multiple Modes**: Tiny, Small, Base, Large, and Gundam (dynamic resolution)
+- **Flexible Prompts**: Customize for documents, figures, or general images
+- **Auto Cleanup**: Removes detection tags and formats output
+- **Progress Tracking**: Real-time progress bars with tqdm
+
+### Processing Modes
+
+| Mode | Resolution | Vision Tokens | Use Case |
+|------|-----------|---------------|----------|
+| Tiny | 512×512 | 64 | Quick preview, simple text |
+| Small | 640×640 | 100 | Simple documents |
+| Base | 1024×1024 | 256 | Standard documents |
+| Large | 1280×1280 | 400 | High-quality documents |
+| Gundam | Dynamic | Variable | Complex layouts (Recommended) |
+
+### Examples
+
+See the `examples/` directory for complete examples:
+- `example_basic_batch.py` - Simple batch processing
+- `example_multiple_modes.py` - Compare different modes
+- `example_custom_prompts.py` - Different prompts for different tasks
+- `example_transformers_backend.py` - Using Transformers backend
+
+### Documentation
+
+For complete documentation, see:
+- [BATCH_OCR_GUIDE.md](BATCH_OCR_GUIDE.md) - Complete batch processing guide
+- [examples/README.md](examples/README.md) - Example usage guide
 
 ## vLLM-Inference
 - VLLM:
