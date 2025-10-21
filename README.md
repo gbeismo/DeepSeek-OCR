@@ -56,6 +56,7 @@
 
 ## Contents
 - [Install](#install)
+- [Web Interface](#web-interface) (NEW! - Easiest way to use)
 - [Batch Processing Wrapper](#batch-processing-wrapper) (NEW!)
 - [vLLM Inference](#vllm-inference)
 - [Transformers Inference](#transformers-inference)
@@ -85,6 +86,80 @@ pip install -r requirements.txt
 pip install flash-attn==2.7.3 --no-build-isolation
 ```
 **Note:** if you want vLLM and transformers codes to run in the same environment, you don't need to worry about this installation error like: vllm 0.8.5+cu118 requires transformers>=4.51.1
+
+## Web Interface
+
+We provide a beautiful, easy-to-use web interface for batch processing images. Simply drag and drop your images in a browser!
+
+### Quick Start
+
+1. **Install web dependencies**:
+```bash
+pip install -r requirements_web.txt
+```
+
+2. **Start the web server**:
+```bash
+python web_server.py
+```
+
+3. **Open in browser**:
+```
+http://localhost:5000
+```
+
+4. **Drag & drop images** and click "Process"!
+
+### Features
+
+- 🖱️ **Drag & Drop Interface**: Intuitive file upload
+- 📊 **Real-time Progress**: Live progress tracking
+- 🎨 **Beautiful UI**: Modern, responsive design
+- ⚙️ **Flexible Settings**: Choose backend, mode, and prompts
+- 📥 **Easy Downloads**: Download markdown results
+- 📋 **Copy to Clipboard**: Quick copy functionality
+
+### Screenshots
+
+The web interface provides:
+- Drag-and-drop image upload
+- Processing mode selection (Tiny, Small, Base, Large, Gundam)
+- Backend selection (vLLM or Transformers)
+- Preset prompts (Markdown, Free OCR, Parse Figure, etc.)
+- Real-time progress tracking
+- Instant result preview and download
+
+### Server Options
+
+```bash
+# Run on custom port
+python web_server.py --port 8080
+
+# Allow external connections
+python web_server.py --host 0.0.0.0
+
+# Set default backend
+python web_server.py --backend transformers --mode base
+```
+
+### REST API
+
+The web server also provides a REST API:
+
+```python
+import requests
+
+# Upload files
+files = [('files[]', open('image.jpg', 'rb'))]
+data = {'prompt': '<image>\n<|grounding|>Convert to markdown.', 'backend': 'vllm'}
+response = requests.post('http://localhost:5000/api/upload', files=files, data=data)
+job_id = response.json()['job_id']
+
+# Get results
+results = requests.get(f'http://localhost:5000/api/job/{job_id}/results')
+```
+
+**Full documentation**: [WEB_INTERFACE_GUIDE.md](WEB_INTERFACE_GUIDE.md)
 
 ## Batch Processing Wrapper
 
